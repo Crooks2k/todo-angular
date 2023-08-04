@@ -17,28 +17,31 @@ export class AppComponent {
   public allItem: any = []
   currentDate: Date = new Date();
 
+  taskTitle = ""
+  addTitle(title: string): void{
+    this.taskTitle = title
+  }
   //ToDo: Eliminar esta lista al momento de integrar la API
   filter: "all" | "active" | "todo" = "all"
 ngOnInit():void{
   this.loadData();
-  }
+}
   public loadData(){
     this.TodoService.getTask('https://todolist-vp6o.onrender.com/todo/')
     .subscribe(response =>{
       console.log (response)
       this.allItem = response;
     })
-}
-  addItem(description:string,dueData:Date | null,todo:string,responsible:string){
+  }
+  addItem(title: string, desc: string, responsable: string, date: string){
     const newTask = {
-      description: description,
-      done:false,
-      dueData: new Date(),
-      todo: todo,
-      responsible: responsible,
+      todo: title,
+      description: desc,
+      responsible: responsable,
+      dueData: date,
+      done: false
     }
     this.allItem.unshift(newTask)
-    this.currentDate = new Date();
     console.log(newTask)
     this.TodoService.postTask("https://todolist-vp6o.onrender.com/todo/create",newTask)
     .subscribe(data =>{
@@ -53,23 +56,6 @@ ngOnInit():void{
       this.filter ==="todo" ? item.todo : !item.todo
     })
   }
-  deleteItem(item:Item){
-    this.allItem.splice(this.allItem.indexOf(item),1)
-  }
 
-  updateItem(description:string,dueData:Date | null,todo:string,responsible:string,oldvalue:string): void {
-    const index = this.allItem.findIndex((item:any) => item.todo === oldvalue);
-    if (index !== -1) {
-      this.allItem[index] = {
-        description: description,
-        done:false,
-        dueData: dueData,
-        todo: todo,
-        responsible: responsible,
-      };
-      this.TodoService.deleteTask("https://todolist-vp6o.onrender.com/todo/delete/:id",this.allItem[index])
-      this.TodoService.updateTask("https://todolist-vp6o.onrender.com/todo/update/:id",this.allItem[index])
-      }
-    }
 }
 
